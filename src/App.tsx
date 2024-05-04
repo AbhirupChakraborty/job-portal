@@ -1,8 +1,9 @@
+import JobsComponent from './Components/JobListComponent'
 
 function App() {
   return (
     <div className="App">
-      React
+      <JobsComponent/>
     </div>
   );
 }
