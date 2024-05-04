@@ -9,6 +9,8 @@ const useStyles = makeStyles({
     justifyContent: "space-around",
     listStyle: "none",
     padding: 0,
+    gap: 15,
+    margin: 10,
   },
 });
 

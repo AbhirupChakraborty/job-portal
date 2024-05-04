@@ -67,7 +67,10 @@ const useStyles = makeStyles({
     },
   }
 });
-
+function convertUSDtoINR(usdAmount : number) {
+    const exchangeRate = 80;
+    return Math.ceil((usdAmount * exchangeRate)/100);
+}
 function JobCard({ job }: JobCardProps) {
   const classes = useStyles();
 
@@ -87,7 +90,7 @@ function JobCard({ job }: JobCardProps) {
         {job.location}
       </Typography>
       <Typography variant="body1" className={classes.salary}>
-        Estimated Salary: ₹ {job.minJdSalary !== null ? job.minJdSalary : 0} - {job.maxJdSalary} LPA ✅
+        Estimated Salary: ₹ {convertUSDtoINR(job.minJdSalary !== null ? job.minJdSalary : 0)} - {convertUSDtoINR(job.maxJdSalary)} LPA ✅
       </Typography>
       <Typography variant="h6" gutterBottom>
         About Company:
