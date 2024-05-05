@@ -12,11 +12,11 @@ const useStyles = makeStyles({
     listStyle: "none",
     padding: 0,
     gap: 15,
-    margin: 10,
+    margin: 15,
   },
   container: {
     overflowY: "scroll",
-    height: "100vh",
+    height: "calc(100vh - 20px)",
   },
   searchInput: {
     marginBottom: 10,
@@ -31,6 +31,7 @@ function JobsComponent() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [locationFilter, setLocationFilter] = useState<string | null>(null);
+  const [minExpFilter, setMinExpFilter] = useState<string | null>(null);
 
   const fetchData = async () => {
     try {
@@ -83,33 +84,31 @@ function JobsComponent() {
     };
   }, [jobs]); // Re-add event listener when jobs change
 
- // Filter jobs based on search query and location filter
+  // Filter jobs based on search query, location filter, and minimum experience filter
   const filteredJobs = jobs.filter((job) => {
     const companyMatchesSearch = job.companyName
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
 
-    if (locationFilter === null) {
-      return companyMatchesSearch;
-    }
+    const locationMatchesFilter =
+      locationFilter === null ||
+      (locationFilter === "remote" && job.location === "remote") ||
+      (locationFilter === "onsite" && job.location !== "remote");
 
-    if (locationFilter === "onsite") {
-      return job.location !== "remote" && companyMatchesSearch;
-    }
+    const minExpMatchesFilter =
+      minExpFilter === null ||
+      (minExpFilter === "fresher" && (job.minExp === 0 || job.minExp === 1)) ||
+      (minExpFilter === "more_than_1" && job.minExp > 1) ||
+      (minExpFilter === "more_than_2" && job.minExp > 2) ||
+      (minExpFilter === "more_than_5" && job.minExp > 5) ||
+      (minExpFilter === "not_specified" && job.minExp === null);
 
-    return job.location === locationFilter && companyMatchesSearch;
+    return companyMatchesSearch && locationMatchesFilter && minExpMatchesFilter;
   });
 
   return (
     <div className={classes.container} ref={containerRef}>
-    <TextField
-        className={classes.searchInput}
-        label="Search Company Name"
-        variant="outlined"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-    />
-    <TextField
+      <TextField
         select
         label="Location Filter"
         variant="outlined"
@@ -120,15 +119,36 @@ function JobsComponent() {
         <MenuItem value="remote">Remote</MenuItem>
         <MenuItem value="onsite">Onsite</MenuItem>
       </TextField>
-    <ul className={classes.root}>
-      {filteredJobs.map((job, index) => (
-        <li key={index}>
-          <JobCard job={job} />
-        </li>
-      ))}
-    </ul>
-    {loading && <p>Loading...</p>}
-  </div>
+      <TextField
+        select
+        label="Minimum Experience Filter"
+        variant="outlined"
+        value={minExpFilter}
+        onChange={(e) => setMinExpFilter(e.target.value)}
+        className={classes.searchInput}
+      >
+        <MenuItem value="fresher">Fresher</MenuItem>
+        <MenuItem value="more_than_1">More than 1 years</MenuItem>
+        <MenuItem value="more_than_2">More than 2 years</MenuItem>
+        <MenuItem value="more_than_5">More than 5 years</MenuItem>
+        <MenuItem value="not_specified">Not Specified</MenuItem>
+      </TextField>
+      <TextField
+        className={classes.searchInput}
+        label="Search Company Name"
+        variant="outlined"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+      <ul className={classes.root}>
+        {filteredJobs.map((job, index) => (
+          <li key={index}>
+            <JobCard job={job} />
+          </li>
+        ))}
+      </ul>
+      {loading && <p>Loading...</p>}
+    </div>
   );
 }
 
