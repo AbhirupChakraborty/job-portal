@@ -21,7 +21,7 @@ interface JobCardProps {
 
 const useStyles = makeStyles({
   timeLine: {
-    width: '40%',
+    width: '150px',
     border: '0.5px solid #D3D3D3',
     borderRadius: '14px !important',
     padding: 3,
@@ -32,7 +32,7 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start', // Added to make content side by side
-    maxWidth: 400,
+    maxWidth: 350,
     margin: 'auto',
     marginBottom: 20,
     padding: 25,
@@ -95,7 +95,7 @@ function JobCard({ job }: JobCardProps) {
           <img src={job.logoUrl} alt="logo" className={classes.companyLogo} />
         </div>
         <div>
-          <Typography className={classes.companyInfo} variant="h6" gutterBottom>
+          <Typography className={classes.companyInfo} variant="subtitle1" gutterBottom>
             {job.companyName}
           </Typography>
           <Typography className={classes.companyInfo} variant="subtitle1" gutterBottom>

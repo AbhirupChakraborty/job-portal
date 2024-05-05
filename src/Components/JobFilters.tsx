@@ -10,20 +10,24 @@ const useStyles = makeStyles({
     flexFlow: 'column',
     marginBottom: 10,
     width: 150,
-    gap: 5,
+  },
+  filters:{
+    display: 'flex',
+    gap: 15,
+    maxHeight: "calc(100vh - 10px)",
   },
 });
 
 interface JobFiltersProps {
     locationFilter: string | null;
     minExpFilter: string | null;
-    roleFilter: string | null; // Change type to string | null
+    roleFilter: string | null;
     availableLocations: string[];
     availableRoles: string[];
     onLocationFilterChange: (value: string | null) => void;
     onMinExpFilterChange: (value: string | null) => void;
     onRoleFilterChange: (value: string | null) => void;
-}
+  }
 
 const JobFilters: React.FC<JobFiltersProps> = ({
   locationFilter,
@@ -38,7 +42,7 @@ const JobFilters: React.FC<JobFiltersProps> = ({
   const classes = useStyles();
 
   return (
-    <>
+    <div className={classes.filters}>
       <TextField
         select
         label="Remote"
@@ -81,7 +85,7 @@ const JobFilters: React.FC<JobFiltersProps> = ({
             </MenuItem>
         ))}
       </TextField>
-    </>
+    </div>
   );
 };
 
