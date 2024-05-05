@@ -32,6 +32,7 @@ function JobsComponent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [locationFilter, setLocationFilter] = useState<string | null>(null);
   const [minExpFilter, setMinExpFilter] = useState<string | null>(null);
+  const [roleFilter, setRoleFilter] = useState<string | null>(null);
 
   const fetchData = async () => {
     try {
@@ -84,7 +85,14 @@ function JobsComponent() {
     };
   }, [jobs]); // Re-add event listener when jobs change
 
-  // Filter jobs based on search query, location filter, and minimum experience filter
+  // Determine unique roles from the jobs in the viewport
+  const rolesInView = Array.from(
+    new Set(
+      jobs.map((job) => job.jobRole) // Assuming "role" is the field for role in job data
+    )
+  );
+
+  // Filter jobs based on search query, location filter, minimum experience filter, and role filter
   const filteredJobs = jobs.filter((job) => {
     const companyMatchesSearch = job.companyName
       .toLowerCase()
@@ -103,7 +111,15 @@ function JobsComponent() {
       (minExpFilter === "more_than_5" && job.minExp > 5) ||
       (minExpFilter === "not_specified" && job.minExp === null);
 
-    return companyMatchesSearch && locationMatchesFilter && minExpMatchesFilter;
+    const roleMatchesFilter =
+      roleFilter === null || roleFilter === job.jobRole;
+
+    return (
+      companyMatchesSearch &&
+      locationMatchesFilter &&
+      minExpMatchesFilter &&
+      roleMatchesFilter
+    );
   });
 
   return (
@@ -132,6 +148,20 @@ function JobsComponent() {
         <MenuItem value="more_than_2">More than 2 years</MenuItem>
         <MenuItem value="more_than_5">More than 5 years</MenuItem>
         <MenuItem value="not_specified">Not Specified</MenuItem>
+      </TextField>
+      <TextField
+        select
+        label="Role Filter"
+        variant="outlined"
+        value={roleFilter}
+        onChange={(e) => setRoleFilter(e.target.value)}
+        className={classes.searchInput}
+      >
+        {rolesInView.map((jobRole) => (
+          <MenuItem key={jobRole} value={jobRole}>
+            {jobRole}
+          </MenuItem>
+        ))}
       </TextField>
       <TextField
         className={classes.searchInput}
