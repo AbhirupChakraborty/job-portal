@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import JobCard from "./JobCard";
 import { makeStyles } from "@mui/styles";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
 
 const useStyles = makeStyles({
   root: {
@@ -16,6 +18,9 @@ const useStyles = makeStyles({
     overflowY: "scroll",
     height: "100vh",
   },
+  searchInput: {
+    marginBottom: 10,
+  },
 });
 
 function JobsComponent() {
@@ -24,6 +29,8 @@ function JobsComponent() {
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [locationFilter, setLocationFilter] = useState<string | null>(null);
 
   const fetchData = async () => {
     try {
@@ -76,17 +83,52 @@ function JobsComponent() {
     };
   }, [jobs]); // Re-add event listener when jobs change
 
+ // Filter jobs based on search query and location filter
+  const filteredJobs = jobs.filter((job) => {
+    const companyMatchesSearch = job.companyName
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+
+    if (locationFilter === null) {
+      return companyMatchesSearch;
+    }
+
+    if (locationFilter === "onsite") {
+      return job.location !== "remote" && companyMatchesSearch;
+    }
+
+    return job.location === locationFilter && companyMatchesSearch;
+  });
+
   return (
     <div className={classes.container} ref={containerRef}>
-      <ul className={classes.root}>
-        {jobs.map((job, index) => (
-          <li key={index}>
-            <JobCard job={job} />
-          </li>
-        ))}
-      </ul>
-      {loading && <p>Loading...</p>}
-    </div>
+    <TextField
+        className={classes.searchInput}
+        label="Search Company Name"
+        variant="outlined"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+    />
+    <TextField
+        select
+        label="Location Filter"
+        variant="outlined"
+        value={locationFilter}
+        onChange={(e) => setLocationFilter(e.target.value)}
+        className={classes.searchInput}
+      >
+        <MenuItem value="remote">Remote</MenuItem>
+        <MenuItem value="onsite">Onsite</MenuItem>
+      </TextField>
+    <ul className={classes.root}>
+      {filteredJobs.map((job, index) => (
+        <li key={index}>
+          <JobCard job={job} />
+        </li>
+      ))}
+    </ul>
+    {loading && <p>Loading...</p>}
+  </div>
   );
 }
 
