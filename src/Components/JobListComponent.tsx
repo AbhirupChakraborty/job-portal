@@ -33,6 +33,7 @@ function JobsComponent() {
   const [locationFilter, setLocationFilter] = useState<string | null>(null);
   const [minExpFilter, setMinExpFilter] = useState<string | null>(null);
   const [roleFilter, setRoleFilter] = useState<string | null>(null);
+  const [availableLocations, setAvailableLocations] = useState<string[]>([]);
 
   const fetchData = async () => {
     try {
@@ -91,6 +92,15 @@ function JobsComponent() {
       jobs.map((job) => job.jobRole) // Assuming "role" is the field for role in job data
     )
   );
+  useEffect(() => {
+    // Determine unique locations from the jobs in the viewport
+    const locationsInView = Array.from(
+      new Set(
+        jobs.map((job) => job.location) // Assuming "location" is the field for location in job data
+      )
+    );
+    setAvailableLocations(locationsInView);
+  }, [jobs]);
 
   // Filter jobs based on search query, location filter, minimum experience filter, and role filter
   const filteredJobs = jobs.filter((job) => {
@@ -99,9 +109,7 @@ function JobsComponent() {
       .includes(searchQuery.toLowerCase());
 
     const locationMatchesFilter =
-      locationFilter === null ||
-      (locationFilter === "remote" && job.location === "remote") ||
-      (locationFilter === "onsite" && job.location !== "remote");
+      locationFilter === null || locationFilter === job.location;
 
     const minExpMatchesFilter =
       minExpFilter === null ||
@@ -126,18 +134,21 @@ function JobsComponent() {
     <div className={classes.container} ref={containerRef}>
       <TextField
         select
-        label="Location Filter"
+        label="Remote"
         variant="outlined"
         value={locationFilter}
         onChange={(e) => setLocationFilter(e.target.value)}
         className={classes.searchInput}
       >
-        <MenuItem value="remote">Remote</MenuItem>
-        <MenuItem value="onsite">Onsite</MenuItem>
+        {availableLocations.map((location) => (
+          <MenuItem key={location} value={location}>
+            {location}
+          </MenuItem>
+        ))}
       </TextField>
       <TextField
         select
-        label="Minimum Experience Filter"
+        label="Experience"
         variant="outlined"
         value={minExpFilter}
         onChange={(e) => setMinExpFilter(e.target.value)}
@@ -151,7 +162,7 @@ function JobsComponent() {
       </TextField>
       <TextField
         select
-        label="Role Filter"
+        label="Roles"
         variant="outlined"
         value={roleFilter}
         onChange={(e) => setRoleFilter(e.target.value)}
