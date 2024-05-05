@@ -2,6 +2,8 @@ import { makeStyles } from '@mui/styles';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
+import { Gradient } from '@mui/icons-material';
+import { hover } from '@testing-library/user-event/dist/hover';
 
 interface Job {
   companyName: string;
@@ -57,6 +59,23 @@ const useStyles = makeStyles({
     marginTop: 10,
     fontSize: 16,
     color: '#A9A9A9',
+  },
+  jobDetails: {
+    '&:after, &:before': {
+      boxSizing: 'inherit',
+    },
+  },
+  description: {
+    maskImage: 'linear-gradient(rgb(255, 255, 255), rgb(255, 255, 255), rgba(255, 255, 255, 0))',
+    cursor: 'pointer',
+  },
+  viewJob: {
+    color: 'blue',
+    textTransform: 'none',
+    backgroundColor: 'transparent',
+    cursor: 'pointer',
+    marginLeft: '40%',
+    paddingBottom: '30%'
   },
   applyButton: {
     width: '100%',
@@ -116,9 +135,12 @@ function JobCard({ job }: JobCardProps) {
         <Typography variant="subtitle1" gutterBottom>
           About us
         </Typography>
-        <Typography variant="body2">
-          {job.jobDetailsFromCompany}
-        </Typography>
+        <p className={classes.jobDetails}>
+          <Typography className={classes.description} variant="body2">
+            <span>{job.jobDetailsFromCompany}</span>
+          </Typography>
+          <span className={classes.viewJob}> View Job </span>
+        </p>
         {job.minExp !== null ? (
           <Typography variant="body1">
             Minimum Experience: 

@@ -16,7 +16,6 @@ const useStyles = makeStyles({
     flexDirection: "row", // Arrange items horizontally
     gap: 5,
     alignItems: "center",
-    // overflowY: "scroll",
     maxHeight: "calc(100vh - 20px)", // Center items vertically
   },
   jobListContainer: {
