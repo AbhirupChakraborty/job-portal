@@ -27,6 +27,9 @@ interface JobFiltersProps {
     onLocationFilterChange: (value: string | null) => void;
     onMinExpFilterChange: (value: string | null) => void;
     onRoleFilterChange: (value: string | null) => void;
+    minSalaryFilter: string | null;
+    availableMinSalaries: number[];
+    onMinSalaryFilterChange: (value: string | null) => void;
   }
 
 const JobFilters: React.FC<JobFiltersProps> = ({
@@ -35,9 +38,12 @@ const JobFilters: React.FC<JobFiltersProps> = ({
   roleFilter,
   availableLocations,
   availableRoles,
+  minSalaryFilter,
+  availableMinSalaries,
   onLocationFilterChange,
   onMinExpFilterChange,
   onRoleFilterChange,
+  onMinSalaryFilterChange,
 }) => {
   const classes = useStyles();
 
@@ -84,6 +90,19 @@ const JobFilters: React.FC<JobFiltersProps> = ({
                 {jobRole}
             </MenuItem>
         ))}
+      </TextField>
+      <TextField
+        select
+        label="Min Base Pay"
+        variant="outlined"
+        value={minSalaryFilter}
+        onChange={(e) => onMinSalaryFilterChange(e.target.value)}
+        className={classes.searchInput}
+      >
+        <MenuItem value="below_5lpa">Below 5 LPA</MenuItem>
+        <MenuItem value="5lpa_to_10lpa">5 LPA to 10 LPA</MenuItem>
+        <MenuItem value="10lpa_to_20lpa">10 LPA to 20 LPA</MenuItem>
+        <MenuItem value="above_20lpa">Above 20 LPA</MenuItem>
       </TextField>
     </div>
   );

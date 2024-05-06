@@ -5,6 +5,7 @@ import TextField from "@mui/material/TextField";
 import JobFilters from "./JobFilters";
 
 const BUFFER_VALUE = 100;
+const exchangeRate = 80;
 
 const useStyles = makeStyles({
   root: {
@@ -45,6 +46,8 @@ function JobsComponent() {
   const [roleFilter, setRoleFilter] = useState<string | null>(null);
   const [availableLocations, setAvailableLocations] = useState<string[]>([]);
   const [availableRoles, setAvailableRoles] = useState<string[]>([]);
+  const [minSalaryFilter, setMinSalaryFilter] = useState<string | null>(null);
+  const [availableMinSalaries, setAvailableMinSalaries] = useState<number[]>([]);
 
   const fetchData = async () => {
     try {
@@ -63,8 +66,15 @@ function JobsComponent() {
         throw new Error("Failed to fetch data");
       }
       const data = await response.json();
+      const convertedJobs = data.jdList?.map((job : any) => ({
+        ...job,
+        minJDSalaryInLPA: Math.ceil((job.minJDSalary * exchangeRate) / 100),
+      }));
       setJobs((prevJobs) => [...prevJobs, ...(data.jdList || [])]);
       setOffset(offset + 10); // Increment offset for the next fetch
+      // Extract and store minJDSalary data
+      const salaries = convertedJobs.jdList.map((job: any) => job.minJDSalaryInLPA);
+      setAvailableMinSalaries(salaries);
     } catch (error) {
       console.error(error);
     } finally {
@@ -126,6 +136,13 @@ function JobsComponent() {
       (minExpFilter === "more_than_5" && job.minExp > 5) ||
       (minExpFilter === "not_specified" && job.minExp === null);
 
+    const minSalaryMatchesFilter =
+      minSalaryFilter === null ||
+      (minSalaryFilter === "below_5lpa" && job.minJDSalary < 5) ||
+      (minSalaryFilter === "5lpa_to_10lpa" && job.minJDSalary >= 5 && job.minJDSalary < 10) ||
+      (minSalaryFilter === "10lpa_to_20lpa" && job.minJDSalary >= 10 && job.minJDSalary < 20) ||
+      (minSalaryFilter === "above_20lpa" && job.minJDSalary >= 20);
+
     const roleMatchesFilter =
       roleFilter === null || roleFilter === job.jobRole;
 
@@ -133,7 +150,8 @@ function JobsComponent() {
       companyMatchesSearch &&
       locationMatchesFilter &&
       minExpMatchesFilter &&
-      roleMatchesFilter
+      roleMatchesFilter &&
+      minSalaryMatchesFilter
     );
   });
 
@@ -149,6 +167,9 @@ function JobsComponent() {
           onLocationFilterChange={setLocationFilter}
           onMinExpFilterChange={setMinExpFilter}
           onRoleFilterChange={setRoleFilter}
+          minSalaryFilter={minSalaryFilter}
+          availableMinSalaries={availableMinSalaries}
+          onMinSalaryFilterChange={setMinSalaryFilter}
         />
         <TextField
           className={classes.searchInput}
