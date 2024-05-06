@@ -142,12 +142,12 @@ function JobCard({ job }: JobCardProps) {
       <Typography sx={{ fontWeight: 'bold' }} variant="subtitle1" gutterBottom>
         About us
       </Typography>
-      <p className={classes.jobDetails}>
+      <div className={classes.jobDetails}>
         <Typography className={classes.description} variant="body2">
           <span>{job.jobDetailsFromCompany}</span>
         </Typography>
         <span className={classes.viewJob}> View Job </span>
-      </p>
+      </div>
       {job.minExp !== null ? (
       <>
         <Typography variant="body1" sx={{ fontWeight: 'bold', color: 'grey', marginTop: '16px' }}>
@@ -168,7 +168,7 @@ function JobCard({ job }: JobCardProps) {
         ⚡Easy Apply
       </Button>
       <Button variant="text" className={classes.referralButton} sx={{ textTransform: 'none' }} href="https://weekday.works">
-        <Stack direction="row" spacing={2}>
+        <Stack direction="row" spacing={0.5}>
           <StyledBadge
             overlap="circular"
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}

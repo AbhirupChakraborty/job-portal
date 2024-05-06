@@ -1,26 +1,28 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import JobCard from "./JobCard";
 import { makeStyles } from "@mui/styles";
 import TextField from "@mui/material/TextField";
-import JobFilters from "./JobFilters"; // Import the new component
+import JobFilters from "./JobFilters";
+
+const BUFFER_VALUE = 100;
 
 const useStyles = makeStyles({
   root: {
     display: "flex",
-    flexDirection: "column", // Set flex direction to column
+    flexDirection: "column",
     gap: 15,
     margin: 15,
   },
   filtersContainer: {
-    display: "flex", // Ensure flex layout
-    flexDirection: "row", // Arrange items horizontally
+    display: "flex",
+    flexDirection: "row",
     gap: 5,
     alignItems: "center",
-    maxHeight: "calc(100vh - 20px)", // Center items vertically
+    maxHeight: "calc(100vh - 20px)",
   },
   jobListContainer: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", // Adjust based on available space
+    gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
     gap: 20,
   },
   jobCard: {
@@ -46,6 +48,7 @@ function JobsComponent() {
 
   const fetchData = async () => {
     try {
+      if (loading) return;
       setLoading(true);
       const requestOptions = {
         method: "POST",
@@ -73,32 +76,27 @@ function JobsComponent() {
     fetchData();
   }, []); // Fetch initial data only once
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!containerRef.current) return;
-      const { scrollTop, clientHeight, scrollHeight } = containerRef.current;
-      // Check if scrolled to the bottom of the container
-      if (scrollHeight - scrollTop === clientHeight) {
-        fetchData(); // Fetch more data when scrolled to the bottom
-      }
-    };
-
-    const container = containerRef.current;
-    if (container) {
-      container.addEventListener("scroll", handleScroll);
+  const handleScroll = useCallback(async () => {
+    if (!containerRef.current) return;
+    const { scrollTop, clientHeight, scrollHeight } = containerRef.current;
+    // Check if scrolled to the bottom of the container with a buffer
+    if (scrollTop + clientHeight >= scrollHeight - BUFFER_VALUE) {
+      await fetchData();
     }
-    // Cleanup event listener
+  }, [containerRef]);
+  
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+  
     return () => {
-      if (container) {
-        container.removeEventListener("scroll", handleScroll);
-      }
+      window.removeEventListener("scroll", handleScroll);
     };
-  }, [jobs]); // Re-add event listener when jobs change
+  }, [handleScroll]);
 
   // Determine unique roles from the jobs in the viewport
   useEffect(() => {
     const rolesInView = Array.from(
-      new Set(jobs.map((job) => job.jobRole)) // Assuming "role" is the field for role in job data
+      new Set(jobs.map((job) => job.jobRole))
     );
     setAvailableRoles(rolesInView);
   }, [jobs]);
@@ -106,7 +104,7 @@ function JobsComponent() {
   useEffect(() => {
     // Determine unique locations from the jobs in the viewport
     const locationsInView = Array.from(
-      new Set(jobs.map((job) => job.location)) // Assuming "location" is the field for location in job data
+      new Set(jobs.map((job) => job.location))
     );
     setAvailableLocations(locationsInView);
   }, [jobs]);
