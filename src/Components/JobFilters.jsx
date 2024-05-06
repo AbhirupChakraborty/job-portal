@@ -1,7 +1,8 @@
-import React from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from "@mui/styles";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
+import { setLocationFilter, setMinExpFilter, setRoleFilter, setMinJDSalaryFilter, selectLocationFilter, selectMinExpFilter, selectRoleFilter, selectMinJDSalaryFilter, selectFilteredJobs } from "../Redux/reducers/jobsSlice";
 
 const useStyles = makeStyles({
   searchInput: {
@@ -18,34 +19,22 @@ const useStyles = makeStyles({
   },
 });
 
-interface JobFiltersProps {
-    locationFilter: string | null;
-    minExpFilter: string | null;
-    roleFilter: string | null;
-    availableLocations: string[];
-    availableRoles: string[];
-    onLocationFilterChange: (value: string | null) => void;
-    onMinExpFilterChange: (value: string | null) => void;
-    onRoleFilterChange: (value: string | null) => void;
-    minSalaryFilter: string | null;
-    availableMinSalaries: number[];
-    onMinSalaryFilterChange: (value: string | null) => void;
-  }
-
-const JobFilters: React.FC<JobFiltersProps> = ({
-  locationFilter,
-  minExpFilter,
-  roleFilter,
-  availableLocations,
-  availableRoles,
-  minSalaryFilter,
-  availableMinSalaries,
-  onLocationFilterChange,
-  onMinExpFilterChange,
-  onRoleFilterChange,
-  onMinSalaryFilterChange,
-}) => {
+const JobFilters = () => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const locationFilter = useSelector(selectLocationFilter);
+  const minExpFilter = useSelector(selectMinExpFilter);
+  const roleFilter = useSelector(selectRoleFilter);
+  const minJDSalaryFilter = useSelector(selectMinJDSalaryFilter);
+  const filteredJobs = useSelector(selectFilteredJobs);
+
+  const availableLocations = Array.from(
+    new Set(filteredJobs.map((job) => job.location))
+  );
+
+  const availableRoles = Array.from(
+    new Set(filteredJobs.map((job) => job.jobRole))
+  );
 
   return (
     <div className={classes.filters}>
@@ -54,7 +43,7 @@ const JobFilters: React.FC<JobFiltersProps> = ({
         label="Remote"
         variant="outlined"
         value={locationFilter}
-        onChange={(e) => onLocationFilterChange(e.target.value)}
+        onChange={(e) => dispatch(setLocationFilter(e.target.value))}
         className={classes.searchInput}
       >
         {availableLocations.map((location) => (
@@ -68,7 +57,7 @@ const JobFilters: React.FC<JobFiltersProps> = ({
         label="Experience"
         variant="outlined"
         value={minExpFilter}
-        onChange={(e) => onMinExpFilterChange(e.target.value)}
+        onChange={(e) => dispatch(setMinExpFilter(e.target.value))}
         className={classes.searchInput}
       >
         <MenuItem value="fresher">Fresher</MenuItem>
@@ -82,7 +71,7 @@ const JobFilters: React.FC<JobFiltersProps> = ({
         label="Roles"
         variant="outlined"
         value={roleFilter}
-        onChange={(e) => onRoleFilterChange(e.target.value)}
+        onChange={(e) => dispatch(setRoleFilter(e.target.value))}
         className={classes.searchInput}
       >
         {availableRoles.map((jobRole) => (
@@ -95,8 +84,8 @@ const JobFilters: React.FC<JobFiltersProps> = ({
         select
         label="Min Base Pay"
         variant="outlined"
-        value={minSalaryFilter}
-        onChange={(e) => onMinSalaryFilterChange(e.target.value)}
+        value={minJDSalaryFilter}
+        onChange={(e) => dispatch(setMinJDSalaryFilter(e.target.value))}
         className={classes.searchInput}
       >
         <MenuItem value="below_5lpa">Below 5 LPA</MenuItem>
